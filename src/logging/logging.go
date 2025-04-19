@@ -7,10 +7,22 @@ import (
 
 var logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
+func Logger() *slog.Logger {
+	return logger
+}
+
+func Debug(message string, args ...any) {
+	logger.Debug(message, args...)
+}
+
 func Info(message string, args ...any) {
-	if len(args) > 0 {
-		logger.Info(message, args...)
-	} else {
-		logger.Info(message)
-	}
+	logger.Info(message, args...)
+}
+
+func Warn(message string, args ...any) {
+	logger.Warn(message, args...)
+}
+
+func Error(message string, args ...any) {
+	logger.Error(message, args...)
 }

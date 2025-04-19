@@ -1,19 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/lcserny/go-authservice/src/logging"
-	"time"
+	"github.com/lcserny/go-authservice/src/web"
+	slogchi "github.com/samber/slog-chi"
+	"net/http"
 )
 
 func main() {
-	amount := 1000000
-
-	startTime := time.Now()
-
-	for i := range amount {
-		logging.Info(fmt.Sprintf("iteration %d", i))
-	}
-
-	logging.Info(fmt.Sprintf("time taken for %d: %v", amount, time.Since(startTime)))
+	r := chi.NewRouter()
+	r.Use(slogchi.New(logging.Logger()))
+	r.Use(middleware.Recoverer)
+	r.Mount("/users", web.UserRoutes())
+	r.Mount("/auth", web.AuthRoutes())
+	http.ListenAndServe(":3000", r)
 }
