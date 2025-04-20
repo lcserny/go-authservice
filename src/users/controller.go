@@ -1,11 +1,23 @@
 package users
 
 import (
-	"github.com/lcserny/go-authservice/src/logging"
 	"net/http"
+
+	"github.com/lcserny/go-authservice/src/config"
+	"github.com/lcserny/go-authservice/src/logging"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+type usersController struct {
+	cfg *config.Config
+}
+
+func NewUsersController(cfg *config.Config) *usersController {
+	return &usersController{
+		cfg: cfg,
+	}
+}
+
+func (c *usersController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logging.Info(r.URL.Path + " " + r.Method)
 	w.Write([]byte(getUser("1")))
 }
