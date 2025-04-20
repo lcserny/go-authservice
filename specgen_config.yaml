@@ -1,0 +1,4 @@
+packageName: generated
+router: chi
+onlyInterfaces: true
+outputAsLibrary: true
