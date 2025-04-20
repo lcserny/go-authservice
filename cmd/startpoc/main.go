@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/lcserny/go-authservice/src/config"
 	"github.com/lcserny/go-authservice/src/logging"
 	"github.com/lcserny/go-authservice/src/web"
@@ -18,6 +19,14 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(slogchi.New(logging.Logger()))
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.RequestID)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+	}))
 	
 	r.Mount("/users", web.UserRoutes(cfg))
 	r.Mount("/auth", web.AuthRoutes(cfg))
