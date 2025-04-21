@@ -27,9 +27,11 @@ func main() {
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 	}))
-	
-	r.Mount("/users", web.UserRoutes(cfg))
-	r.Mount("/auth", web.AuthRoutes(cfg))
+
+	r.Route(cfg.Path, func(r chi.Router) {
+		r.Mount("/users", web.UserRoutes(cfg))
+		r.Mount("/auth", web.AuthRoutes(cfg))
+	})
 
 	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), r)
 }
