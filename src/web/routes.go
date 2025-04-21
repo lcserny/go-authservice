@@ -12,7 +12,7 @@ import (
 func UserRoutes(cfg *config.Config) *chi.Mux {
 	ctrl := users.NewUsersController(cfg)
 	r := chi.NewRouter()
-	r.With(authMiddleware).Get("/", ctrl.GetUsers)
+	r.With(authMiddleware).Get("/{userId}", ctrl.GetUserAPI)
 	return r
 }
 
@@ -24,15 +24,15 @@ func AuthRoutes(cfg *config.Config) *chi.Mux {
 }
 
 func authMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Example: Check for a valid Authorization header
-        authHeader := r.Header.Get("Authorization")
-        if authHeader == "" {
-            http.Error(w, "Unauthorized", http.StatusUnauthorized)
-            return
-        }
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Example: Check for a valid Authorization header
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
-        // Call the next handler if authorized
-        next.ServeHTTP(w, r)
-    })
+		// Call the next handler if authorized
+		next.ServeHTTP(w, r)
+	})
 }
