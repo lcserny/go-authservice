@@ -28,10 +28,13 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	r.Route(cfg.Path, func(r chi.Router) {
+	r.Route(cfg.ContextPath, func(r chi.Router) {
 		r.Mount("/users", web.UserRoutes(cfg))
 		r.Mount("/auth", web.AuthRoutes(cfg))
 	})
 
-	http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), r)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port), r)
+	if err != nil {
+		println(err.Error())
+	}
 }

@@ -12,14 +12,14 @@ import (
 func UserRoutes(cfg *config.Config) *chi.Mux {
 	ctrl := users.NewUsersController(cfg)
 	r := chi.NewRouter()
-	r.With(authMiddleware).Get("/{userId}", ctrl.GetUserAPI)
+	r.Get("/{userId}", ctrl.GetUserAPI)
 	return r
 }
 
 func AuthRoutes(cfg *config.Config) *chi.Mux {
 	ctrl := auth.NewAuthController(cfg)
 	r := chi.NewRouter()
-	r.Get("/", ctrl.SignIn)
+	r.With(authMiddleware).Get("/", ctrl.SignIn)
 	return r
 }
 

@@ -6,9 +6,9 @@ import (
 )
 
 type Config struct {
-	Port int    `mapstructure:"port"`
-	Host string `mapstructure:"host"`
-	Path string `mapstructure:"path"`
+	Port        int    `mapstructure:"port"`
+	Host        string `mapstructure:"host"`
+	ContextPath string `mapstructure:"contextPath"`
 }
 
 func NewConfig() *Config {
@@ -21,9 +21,9 @@ func NewConfig() *Config {
 
 	viper.AutomaticEnv()
 
-	viper.SetDefault("port", 3000)
+	viper.SetDefault("port", 3003)
 	viper.SetDefault("host", "localhost")
-	viper.SetDefault("path", "/security")
+	viper.SetDefault("contextPath", "/security")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

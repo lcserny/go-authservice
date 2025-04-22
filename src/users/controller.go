@@ -10,24 +10,24 @@ import (
 	"github.com/lcserny/go-authservice/src/logging"
 )
 
-var _ generated.GetSingleUserAPIServicer = (*usersController)(nil)
+var _ generated.GetSingleUserAPIServicer = (*Controller)(nil)
 
-type usersController struct {
+type Controller struct {
 	cfg *config.Config
 }
 
-func NewUsersController(cfg *config.Config) *usersController {
-	return &usersController{
+func NewUsersController(cfg *config.Config) *Controller {
+	return &Controller{
 		cfg: cfg,
 	}
 }
 
 // TODO: do actual work, call service and transform to ImplResponse here
-func (c *usersController) GetUser(context.Context, string) (generated.ImplResponse, error) {
-	return generated.ImplResponse{}, nil
+func (c *Controller) GetUser(context.Context, string) (generated.ImplResponse, error) {
+	return generated.ImplResponse{200, "body"}, nil
 }
 
-func (c *usersController) GetUserAPI(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetUserAPI(w http.ResponseWriter, r *http.Request) {
 	logging.Info(r.URL.Path + " " + r.Method)
 
 	userId := chi.URLParam(r, "userId")
@@ -37,7 +37,7 @@ func (c *usersController) GetUserAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	resp, err, := c.GetUser(ctx, userId)
+	resp, err := c.GetUser(ctx, userId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -45,6 +45,6 @@ func (c *usersController) GetUserAPI(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(resp.Code)
 	if resp.Body != nil {
-		w.Write(resp.Body)
+		w.Write([]byte(resp.Body.(string)))
 	}
 }
