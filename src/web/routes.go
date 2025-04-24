@@ -9,14 +9,19 @@ import (
 	"github.com/lcserny/go-authservice/src/users"
 )
 
-func UserRoutes(cfg *config.Config) *chi.Mux {
+func MountRoutes(cfg *config.Config, r chi.Router) {
+	r.Mount("/users", userRoutes(cfg))
+	r.Mount("/auth", authRoutes(cfg))
+}
+
+func userRoutes(cfg *config.Config) *chi.Mux {
 	ctrl := users.NewUsersController(cfg)
 	r := chi.NewRouter()
 	r.Get("/{userId}", ctrl.GetUserAPI)
 	return r
 }
 
-func AuthRoutes(cfg *config.Config) *chi.Mux {
+func authRoutes(cfg *config.Config) *chi.Mux {
 	ctrl := auth.NewAuthController(cfg)
 	r := chi.NewRouter()
 	r.With(authMiddleware).Get("/", ctrl.SignIn)

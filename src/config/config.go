@@ -5,10 +5,47 @@ import (
 	"github.com/spf13/viper"
 )
 
+type AuthenticationConfig struct {
+	Algorithm               string   `mapstructure:"algorithm" validate:"oneof=HS256 HS384 HS512 RS256 RS384 RS512 ES256 ES384 ES512 PS256 PS384 PS512 none"`
+	PrivateKey              string   `mapstructure:"privateKey"`
+	PublicKey               string   `mapstructure:"publicKey"`
+	Secret                  string   `mapstructure:"secret"`
+	AccessExpirationMinutes int      `mapstructure:"accessExpirationMinutes"`
+	RefreshExpirationDays   int      `mapstructure:"refreshExpirationDays"`
+	RefreshTokenName        string   `mapstructure:"refreshTokenName"`
+	Issuer                  string   `mapstructure:"issuer"`
+	Audience                []string `mapstructure:"audience"`
+	SaltTimes               int      `mapstructure:"saltTimes"`
+	SaltText                string   `mapstructure:"saltText"`
+}
+
+type DatabaseConfig struct {
+	Url        string `mapstructure:"url"`
+	Sync       bool   `mapstructure:"sync"`
+	AuthSource string `mapstructure:"authSource"`
+	Type       string `mapstructure:"type" validate:"oneof=mysql postgres cockroachdb sap mariadb sqlite cordova react-native nativescript sqljs oracle mssql mongodb aurora-mysql aurora-postgres expo better-sqlite3 capacitor spanner"`
+}
+
+type LogConfig struct {
+	File    string `mapstructure:"file"`
+	Level   string `mapstructure:"level"`
+	Json    bool   `mapstructure:"json"`
+	Size    string `mapstructure:"size"`
+	NrFiles string `mapstructure:"nrFiles"`
+}
+
+type ApplicationConfig struct {
+	Name string    `mapstructure:"name"`
+	Port int       `mapstructure:"port"`
+	Path string    `mapstructure:"path"`
+	Env  string    `mapstructure:"env"`
+	Log  LogConfig `mapstructure:"log"`
+}
+
 type Config struct {
-	Port        int    `mapstructure:"port"`
-	Host        string `mapstructure:"host"`
-	ContextPath string `mapstructure:"contextPath"`
+	Application    ApplicationConfig    `mapstructure:"application"`
+	Database       DatabaseConfig       `mapstructure:"database"`
+	Authentication AuthenticationConfig `mapstructure:"authentication"`
 }
 
 func NewConfig() *Config {
@@ -21,9 +58,12 @@ func NewConfig() *Config {
 
 	viper.AutomaticEnv()
 
-	viper.SetDefault("port", 3003)
-	viper.SetDefault("host", "localhost")
-	viper.SetDefault("contextPath", "/security")
+	viper.SetDefault("application.log.size", "20m")
+	viper.SetDefault("application.log.nrFiles", "14d")
+	viper.SetDefault("database.authSource", "admin")
+	viper.SetDefault("database.type", "mongodb")
+	viper.SetDefault("authentication.saltTimes", 10)
+	viper.SetDefault("authentication.refreshTokenName", "refreshToken")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
