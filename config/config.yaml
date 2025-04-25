@@ -22,4 +22,5 @@ authentication:
     audience:
         - commander
         - auth-service-dev
-    salt: 10
+    salt:
+        hello: 10

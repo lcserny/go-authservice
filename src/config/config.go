@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"github.com/lcserny/go-authservice/src/logging"
 	"github.com/spf13/viper"
 )
@@ -15,8 +17,19 @@ type AuthenticationConfig struct {
 	RefreshTokenName        string   `mapstructure:"refreshTokenName"`
 	Issuer                  string   `mapstructure:"issuer"`
 	Audience                []string `mapstructure:"audience"`
-	SaltTimes               int      `mapstructure:"saltTimes"`
-	SaltText                string   `mapstructure:"saltText"`
+	Salt                    any      `mapstructure:"salt"`
+}
+
+func (c AuthenticationConfig) validate() error {
+	switch v := c.Salt.(type) {
+	case string:
+	case int:
+	default:
+		msg := fmt.Sprintf("invalid salt value '%v', only string and int supported", v)
+		logging.Error(msg)
+		return errors.New(msg)
+	}
+	return nil
 }
 
 type DatabaseConfig struct {
@@ -76,6 +89,10 @@ func NewConfig() *Config {
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		panic("Unable to decode into struct: " + err.Error())
+	}
+
+	if err := config.Authentication.validate(); err != nil {
+		panic(err.Error())
 	}
 
 	return &config
