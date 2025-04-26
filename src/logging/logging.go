@@ -26,3 +26,8 @@ func Warn(message string, args ...any) {
 func Error(message string, args ...any) {
 	logger.Error(message, args...)
 }
+
+func Fatal(message string, args ...any) {
+	Error(message, args...)
+	panic(message)
+}

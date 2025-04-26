@@ -21,9 +21,11 @@ type AuthenticationConfig struct {
 
 type DatabaseConfig struct {
 	Url        string `mapstructure:"url"`
-	Sync       bool   `mapstructure:"sync"`
+	Database   string `mapstructure:"database"`
+	Username   string `mapstructure:"username"`
+	Password   string `mapstructure:"password"`
 	AuthSource string `mapstructure:"authSource"`
-	Type       string `mapstructure:"type" validate:"oneof=mysql postgres cockroachdb sap mariadb sqlite cordova react-native nativescript sqljs oracle mssql mongodb aurora-mysql aurora-postgres expo better-sqlite3 capacitor spanner"`
+	Type       string `mapstructure:"type" validate:"oneof=postgres mariadb sqlite mongodb"`
 }
 
 type LogConfig struct {
@@ -79,9 +81,9 @@ func NewConfig() *Config {
 	}
 
 	validate := validator.New()
-    if err := validate.Struct(config); err != nil {
-        panic("Configuration validation failed: " + err.Error())
-    }
+	if err := validate.Struct(config); err != nil {
+		panic("Configuration validation failed: " + err.Error())
+	}
 
 	return &config
 }

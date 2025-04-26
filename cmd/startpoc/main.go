@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/lcserny/go-authservice/pkg/mongodb"
 	"github.com/lcserny/go-authservice/src/config"
 	"github.com/lcserny/go-authservice/src/logging"
 	"github.com/lcserny/go-authservice/src/web"
@@ -15,6 +16,8 @@ import (
 
 func main() {
 	cfg := config.NewConfig()
+
+	repoProdiver := mongodb.NewMongoRepositoryProvider(cfg)
 
 	r := chi.NewRouter()
 	r.Use(slogchi.New(logging.Logger()))
@@ -29,7 +32,7 @@ func main() {
 	}))
 
 	r.Route(cfg.Application.Path, func(r chi.Router) {
-		web.MountRoutes(cfg, r)
+		web.MountRoutes(cfg, repoProdiver, r)
 	})
 
 	logging.Info(fmt.Sprintf("Starting %s on port: %d", cfg.Application.Name, cfg.Application.Port))

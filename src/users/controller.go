@@ -14,11 +14,13 @@ var _ generated.GetSingleUserAPIServicer = (*Controller)(nil)
 
 type Controller struct {
 	cfg *config.Config
+	service *Service
 }
 
-func NewUsersController(cfg *config.Config) *Controller {
+func NewUsersController(cfg *config.Config, service *Service) *Controller {
 	return &Controller{
 		cfg: cfg,
+		service: service,
 	}
 }
 
