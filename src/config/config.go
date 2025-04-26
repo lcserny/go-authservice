@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/lcserny/go-authservice/src/logging"
 	"github.com/spf13/viper"
 )
@@ -77,7 +78,10 @@ func NewConfig() *Config {
 		panic("Unable to decode into struct: " + err.Error())
 	}
 
-	// validate values cause mapstructure validate doesn't work???
+	validate := validator.New()
+    if err := validate.Struct(config); err != nil {
+        panic("Configuration validation failed: " + err.Error())
+    }
 
 	return &config
 }

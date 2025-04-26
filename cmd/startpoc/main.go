@@ -32,10 +32,8 @@ func main() {
 		web.MountRoutes(cfg, r)
 	})
 
-	fmt.Printf("%v\n", cfg)
-
 	logging.Info(fmt.Sprintf("Starting %s on port: %d", cfg.Application.Name, cfg.Application.Port))
-	err := http.ListenAndServe(fmt.Sprintf(": %d", cfg.Application.Port), r)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Application.Port), r)
 	if err != nil {
 		println(err.Error())
 	}
