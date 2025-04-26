@@ -1,5 +1,11 @@
 package users
 
+import "context"
+
+type User struct {
+	ID   string
+}
+
 type UserRepository interface {
-	// TODO
+	 GetUserByID(ctx context.Context, id string) (*User, error)
 }
