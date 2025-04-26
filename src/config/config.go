@@ -1,8 +1,6 @@
 package config
 
 import (
-	"errors"
-	"fmt"
 	"github.com/lcserny/go-authservice/src/logging"
 	"github.com/spf13/viper"
 )
@@ -17,19 +15,7 @@ type AuthenticationConfig struct {
 	RefreshTokenName        string   `mapstructure:"refreshTokenName"`
 	Issuer                  string   `mapstructure:"issuer"`
 	Audience                []string `mapstructure:"audience"`
-	Salt                    any      `mapstructure:"salt"`
-}
-
-func (c AuthenticationConfig) validate() error {
-	switch v := c.Salt.(type) {
-	case string:
-	case int:
-	default:
-		msg := fmt.Sprintf("invalid salt value '%v', only string and int supported", v)
-		logging.Error(msg)
-		return errors.New(msg)
-	}
-	return nil
+	Salt                    string   `mapstructure:"salt"`
 }
 
 type DatabaseConfig struct {
@@ -91,9 +77,7 @@ func NewConfig() *Config {
 		panic("Unable to decode into struct: " + err.Error())
 	}
 
-	if err := config.Authentication.validate(); err != nil {
-		panic(err.Error())
-	}
+	// validate values cause mapstructure validate doesn't work???
 
 	return &config
 }
