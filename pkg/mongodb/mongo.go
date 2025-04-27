@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"time"
 
 	"github.com/lcserny/go-authservice/src/auth"
 	"github.com/lcserny/go-authservice/src/config"
@@ -18,7 +19,11 @@ const (
 )
 
 func connect(url string) *mongo.Client {
-	client, err := mongo.Connect(options.Client().ApplyURI(url))
+	clientOptions := options.Client()
+	timeout := 5 * time.Second
+	clientOptions.ConnectTimeout = &timeout
+
+	client, err := mongo.Connect(clientOptions.ApplyURI(url))
 	if err != nil {
 		logging.Fatal(err.Error())
 	}
