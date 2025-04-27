@@ -14,7 +14,7 @@ import (
 
 const (
 	usersCollection = "users"
-	authCollection = "auth"
+	authCollection  = "auth"
 )
 
 func connect(url string) *mongo.Client {
@@ -26,7 +26,7 @@ func connect(url string) *mongo.Client {
 	if err := client.Ping(context.Background(), nil); err != nil {
 		logging.Fatal(err.Error())
 	}
-	
+
 	logging.Info("MongoDB connected")
 
 	return client
@@ -35,13 +35,13 @@ func connect(url string) *mongo.Client {
 func NewMongoRepositoryProvider(cfg *config.Config) db.RepositoryProvider {
 	client := connect(cfg.Database.Url)
 	return &mongoRepositoryProvider{
-		cfg: cfg,
+		cfg:    cfg,
 		client: client,
 	}
 }
 
 type mongoRepositoryProvider struct {
-	cfg *config.Config
+	cfg    *config.Config
 	client *mongo.Client
 }
 
@@ -63,13 +63,22 @@ type mongoUserRepository struct {
 	collection *mongo.Collection
 }
 
+func (ur *mongoUserRepository) CreateUser(ctx context.Context, user *users.User) error {
+	_, err := ur.collection.InsertOne(ctx, user)
+	if err != nil {
+		return err
+	}
+	logging.Info("User created with ID: " + user.ID)
+	return nil
+}
+
 func (ur *mongoUserRepository) GetUserByID(ctx context.Context, id string) (*users.User, error) {
 	var user users.User
-	err := ur.collection.FindOne(ctx, map[string]any{"_id": id}).Decode(&user)
+	err := ur.collection.FindOne(ctx, map[string]any{"id": id}).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
-	return &user, nil	
+	return &user, nil
 }
 
 type mongoAuthRepository struct {

@@ -19,6 +19,7 @@ func userRoutes(cfg *config.Config, repo users.UserRepository) *chi.Mux {
 	service := users.NewUserService(cfg, repo)
 	ctrl := users.NewUsersController(cfg, service)
 	r := chi.NewRouter()
+	r.Post("/", ctrl.CreateUserAPI)
 	r.Get("/{userId}", ctrl.GetUserAPI)
 	return r
 }

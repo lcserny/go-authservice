@@ -1,9 +1,13 @@
 package users
 
-import "github.com/lcserny/go-authservice/src/config"
+import (
+	"context"
+	"errors"
+	"github.com/lcserny/go-authservice/src/config"
+)
 
 type Service struct {
-	cfg *config.Config
+	cfg  *config.Config
 	repo UserRepository
 }
 
@@ -14,6 +18,18 @@ func NewUserService(cfg *config.Config, repo UserRepository) *Service {
 	}
 }
 
-func (s *Service) GetUser(id string) string {
-	return "a user"
+func (s *Service) GetUser(ctx context.Context, id string) (*User, error) {
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, errors.New("Error getting user: " + err.Error())
+	}
+	return user, nil
+}
+
+func (s *Service) CreateUser(ctx context.Context, id string) (*User, error) {
+	user := User{ID: id}
+	if err := s.repo.CreateUser(ctx, &user); err != nil {
+		return nil, errors.New("Error creating user: " + err.Error())
+	}
+	return &user, nil
 }

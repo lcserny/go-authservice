@@ -10,6 +10,7 @@ application:
 
 database:
     url: "mongodb://root:rootpassword@localhost:27017/?retryWrites=true&w=majority&authSource=admin"
+    database: "auth-service"
 
 authentication:
     algorithm: "HS256"
