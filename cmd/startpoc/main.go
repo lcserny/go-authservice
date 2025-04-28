@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/lcserny/go-authservice/pkg/mongodb"
@@ -17,9 +16,10 @@ import (
 func main() {
 	cfg := config.NewConfig()
 
-	repoProdiver := mongodb.NewMongoRepositoryProvider(cfg)
+	repoProvider := mongodb.NewMongoRepositoryProvider(cfg)
 
-	r := chi.NewRouter()
+	r := web.InitRouter(cfg, repoProvider)
+	// FIXME: cant add Use() middleware after controllers are added in router, provide a custom NewRouter()?
 	r.Use(slogchi.New(logging.Logger()))
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
@@ -30,10 +30,6 @@ func main() {
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
 	}))
-
-	r.Route(cfg.Application.Path, func(r chi.Router) {
-		web.MountRoutes(cfg, repoProdiver, r)
-	})
 
 	logging.Info(fmt.Sprintf("Starting %s on port: %d", cfg.Application.Name, cfg.Application.Port))
 	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Application.Port), r)

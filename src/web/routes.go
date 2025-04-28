@@ -1,35 +1,37 @@
 package web
 
 import (
+	"github.com/lcserny/go-authservice/src/generated"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/lcserny/go-authservice/src/auth"
 	"github.com/lcserny/go-authservice/src/config"
 	"github.com/lcserny/go-authservice/src/db"
 	"github.com/lcserny/go-authservice/src/users"
 )
 
-func MountRoutes(cfg *config.Config, repoProdiver db.RepositoryProvider, r chi.Router) {
-	r.Mount("/users", userRoutes(cfg, repoProdiver.GetUserRepository()))
-	r.Mount("/auth", authRoutes(cfg, repoProdiver.GetAuthRepository()))
+func InitRouter(cfg *config.Config, repoProvider db.RepositoryProvider) chi.Router {
+	var controllers []generated.Router
+	controllers = append(controllers, userControllers(cfg, repoProvider)...)
+	controllers = append(controllers, authControllers(cfg, repoProvider)...)
+	return generated.NewRouter(controllers...)
 }
 
-func userRoutes(cfg *config.Config, repo users.UserRepository) *chi.Mux {
-	service := users.NewUserService(cfg, repo)
-	ctrl := users.NewUsersController(cfg, service)
-	r := chi.NewRouter()
-	r.Post("/", ctrl.CreateUserAPI)
-	r.Get("/{userId}", ctrl.GetUserAPI)
-	return r
+func userControllers(cfg *config.Config, repoProvider db.RepositoryProvider) []generated.Router {
+	userService := users.NewService(cfg, repoProvider.GetUserRepository())
+	return []generated.Router{
+		generated.NewGetSingleUserAPIController(userService),
+		generated.NewGetUsersResourceAPIController(userService),
+		generated.NewCreateUserResourceAPIController(userService),
+		generated.NewUpdateSingleUserDataAPIController(userService),
+	}
 }
 
-func authRoutes(cfg *config.Config, repo auth.AuthRepository) *chi.Mux {
-	// service := auth.NewAuthService(repo)
-	ctrl := auth.NewAuthController(cfg)
-	r := chi.NewRouter()
-	r.With(authMiddleware).Get("/", ctrl.SignIn)
-	return r
+func authControllers(cfg *config.Config, repoProvider db.RepositoryProvider) []generated.Router {
+	return []generated.Router{
+		// TODO init the rest of controllers and service
+		// TODO use a XXXAPIOption to add authMiddlewareGuard
+	}
 }
 
 func authMiddleware(next http.Handler) http.Handler {
