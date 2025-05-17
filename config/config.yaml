@@ -1,6 +1,6 @@
 application:
     name: auth-service-dev
-    port: 8081
+    port: 10031
     path: "/security"
     env: "development"
     log:
